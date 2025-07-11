@@ -6,39 +6,41 @@ import { Advocate, AdvocatesSuccessResponse } from "./apiTypes";
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
   const [filteredAdvocates, setFilteredAdvocates] = useState<Advocate[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    console.log("fetching advocates...");
-    fetch("/api/advocates?limit=20").then((response) => {
-      response.json().then((jsonResponse: AdvocatesSuccessResponse) => {
+    const fetchAdvocates = async () => {
+      try {
+        const response = await fetch("/api/advocates?limit=20");
+        const jsonResponse: AdvocatesSuccessResponse = await response.json();
         setAdvocates(jsonResponse.data);
         setFilteredAdvocates(jsonResponse.data);
-      });
-    });
+      } catch (error) {
+      }
+    };
+
+    fetchAdvocates();
   }, []);
 
-  const onChange = (e) => {
-    const searchTerm = e.target.value;
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchValue = e.target.value;
+    setSearchTerm(searchValue);
 
-    document.getElementById("search-term").innerHTML = searchTerm;
-
-    console.log("filtering advocates...");
     const filteredAdvocates = advocates.filter((advocate) => {
       return (
-        advocate.firstName.includes(searchTerm) ||
-        advocate.lastName.includes(searchTerm) ||
-        advocate.city.includes(searchTerm) ||
-        advocate.degree.includes(searchTerm) ||
-        advocate.specialties.includes(searchTerm) ||
-        advocate.yearsOfExperience.includes(searchTerm)
+        advocate.firstName.includes(searchValue) ||
+        advocate.lastName.includes(searchValue) ||
+        advocate.city.includes(searchValue) ||
+        advocate.degree.includes(searchValue) ||
+        advocate.specialties.some(specialty => specialty.includes(searchValue)) ||
+        advocate.yearsOfExperience.toString().includes(searchValue)
       );
     });
 
     setFilteredAdvocates(filteredAdvocates);
   };
 
-  const onClick = () => {
-    console.log(advocates);
+  const resetSearch = () => {
     setFilteredAdvocates(advocates);
   };
 
@@ -50,10 +52,10 @@ export default function Home() {
       <div>
         <p>Search</p>
         <p>
-          Searching for: <span id="search-term"></span>
+          Searching for: <span>{searchTerm}</span>
         </p>
-        <input style={{ border: "1px solid black" }} onChange={onChange} />
-        <button onClick={onClick}>Reset Search</button>
+        <input style={{ border: "1px solid black" }} onChange={onSearchChange} />
+        <button onClick={resetSearch}>Reset Search</button>
       </div>
       <br />
       <br />
@@ -68,16 +70,16 @@ export default function Home() {
           <th>Phone Number</th>
         </thead>
         <tbody>
-          {filteredAdvocates.map((advocate) => {
+          {filteredAdvocates.map((advocate, index) => {
             return (
-              <tr>
+              <tr key={advocate.id || index}>
                 <td>{advocate.firstName}</td>
                 <td>{advocate.lastName}</td>
                 <td>{advocate.city}</td>
                 <td>{advocate.degree}</td>
                 <td>
-                  {advocate.specialties.map((s) => (
-                    <div>{s}</div>
+                  {advocate.specialties.map((s, i) => (
+                    <div key={i}>{s}</div>
                   ))}
                 </td>
                 <td>{advocate.yearsOfExperience}</td>
