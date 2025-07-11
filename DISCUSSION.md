@@ -11,3 +11,7 @@ Updated the advocates API to support pagination with configurable page size and 
 ## 3. Fixed Basic Frontend Errors and Bad Practices
 
 Cleaned up the React component to follow best practices and fix TypeScript errors. Added proper event typing, replaced direct DOM manipulation with React state, fixed array search logic for specialties, added missing React keys, renamed functions for quicker understanding, and converted nested promises to async/await. These changes linter errors and make the code more maintainable.
+
+## 4. Added Table Pagination and Reusable Component
+
+Implemented frontend pagination controls with page numbers, previous/next buttons, and result counters. Created a generic PaginationTable component that can be reused throughout the application with any data type. This separates concerns by moving table rendering logic out of the main page component and makes the codebase more modular and maintainable.
