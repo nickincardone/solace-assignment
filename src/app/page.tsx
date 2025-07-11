@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Advocate, AdvocatesSuccessResponse } from "./apiTypes";
 
 export default function Home() {
-  const [advocates, setAdvocates] = useState([]);
-  const [filteredAdvocates, setFilteredAdvocates] = useState([]);
+  const [advocates, setAdvocates] = useState<Advocate[]>([]);
+  const [filteredAdvocates, setFilteredAdvocates] = useState<Advocate[]>([]);
 
   useEffect(() => {
     console.log("fetching advocates...");
-    fetch("/api/advocates").then((response) => {
-      response.json().then((jsonResponse) => {
+    fetch("/api/advocates?limit=20").then((response) => {
+      response.json().then((jsonResponse: AdvocatesSuccessResponse) => {
         setAdvocates(jsonResponse.data);
         setFilteredAdvocates(jsonResponse.data);
       });
