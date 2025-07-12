@@ -20,6 +20,10 @@ Implemented frontend pagination controls with page numbers, previous/next button
 
 Added debounced search functionality that waits 300ms after the user stops typing before filtering results, preventing excessive computations on every keystroke. Implemented proper error handling with user-friendly error messages that appear when API calls fail. Also made search case-insensitive and extracted filter logic into reusable functions for better code organization.
 
-## 6. Implemented Modern UI Design with Tailwind CSS
+## 6. Implemented UI Design with Tailwind CSS
 
 Transformed the basic HTML table into a modern, professional interface using Tailwind CSS. The overall design is now mobile-responsive and follows modern web design principles, making the application visually appealing and user-friendly.
+
+## 7. Added Jest Testing Framework
+
+Integrated Jest testing framework with TypeScript support for comprehensive unit testing. Created test suites for the advocateFilter function that cover all search criteria including name, city, degree, specialties, and years of experience. The tests validate both single advocate filtering and multiple advocate scenarios with various search patterns, ensuring the filter logic works correctly across different use cases and edge conditions.
