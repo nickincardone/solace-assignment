@@ -4,22 +4,43 @@ import { useEffect, useState } from "react";
 import { Advocate, AdvocatesSuccessResponse, PaginationMetadata } from "./apiTypes";
 import PaginationTable from "../components/PaginationTable";
 
+const advocateFilter = (searchTerm: string) => {
+  const lowerSearchTerm = searchTerm.toLowerCase();
+  
+  return (advocate: Advocate): boolean => {
+    return (
+      advocate.firstName.toLowerCase().includes(lowerSearchTerm) ||
+      advocate.lastName.toLowerCase().includes(lowerSearchTerm) ||
+      advocate.city.toLowerCase().includes(lowerSearchTerm) ||
+      advocate.degree.toLowerCase().includes(lowerSearchTerm) ||
+      advocate.specialties.some(specialty => specialty.toLowerCase().includes(lowerSearchTerm)) ||
+      advocate.yearsOfExperience.toString().includes(lowerSearchTerm)
+    );
+  };
+};
+
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
   const [filteredAdvocates, setFilteredAdvocates] = useState<Advocate[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationMetadata | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchAdvocates = async (page: number = 1) => {
     try {
+      setError(null);
+
       const response = await fetch(`/api/advocates?limit=20&page=${page}`);
       const jsonResponse: AdvocatesSuccessResponse = await response.json();
+      
       setAdvocates(jsonResponse.data);
       setFilteredAdvocates(jsonResponse.data);
       setPagination(jsonResponse.pagination);
       setCurrentPage(page);
     } catch (error) {
+      setError("Sorry an error occurred");
+      console.error("Error fetching advocates:", error);
     }
   };
 
@@ -27,22 +48,22 @@ export default function Home() {
     fetchAdvocates(currentPage);
   }, []);
 
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm.trim() === "") {
+        setFilteredAdvocates(advocates);
+      } else {
+        setFilteredAdvocates(advocates.filter(advocateFilter(searchTerm)));
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, advocates]);
+
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.target.value;
     setSearchTerm(searchValue);
-
-    const filteredAdvocates = advocates.filter((advocate) => {
-      return (
-        advocate.firstName.includes(searchValue) ||
-        advocate.lastName.includes(searchValue) ||
-        advocate.city.includes(searchValue) ||
-        advocate.degree.includes(searchValue) ||
-        advocate.specialties.some(specialty => specialty.includes(searchValue)) ||
-        advocate.yearsOfExperience.toString().includes(searchValue)
-      );
-    });
-
-    setFilteredAdvocates(filteredAdvocates);
   };
 
   const resetSearch = () => {
@@ -104,6 +125,13 @@ export default function Home() {
       <h1>Solace Advocates</h1>
       <br />
       <br />
+      
+      {error && (
+        <div style={{ color: "red", marginBottom: "20px" }}>
+          {error}
+        </div>
+      )}
+      
       <div>
         <p>Search</p>
         <p>

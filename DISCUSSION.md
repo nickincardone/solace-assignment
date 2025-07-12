@@ -15,3 +15,7 @@ Cleaned up the React component to follow best practices and fix TypeScript error
 ## 4. Added Table Pagination and Reusable Component
 
 Implemented frontend pagination controls with page numbers, previous/next buttons, and result counters. Created a generic PaginationTable component that can be reused throughout the application with any data type. This separates concerns by moving table rendering logic out of the main page component and makes the codebase more modular and maintainable.
+
+## 5. Enhanced Search with Debouncing and Error Handling
+
+Added debounced search functionality that waits 300ms after the user stops typing before filtering results, preventing excessive computations on every keystroke. Implemented proper error handling with user-friendly error messages that appear when API calls fail. Also made search case-insensitive and extracted filter logic into reusable functions for better code organization.
