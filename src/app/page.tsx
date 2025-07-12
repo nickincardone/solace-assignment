@@ -3,21 +3,8 @@
 import { useEffect, useState } from "react";
 import { Advocate, AdvocatesSuccessResponse, PaginationMetadata } from "./apiTypes";
 import PaginationTable from "../components/PaginationTable";
-
-const advocateFilter = (searchTerm: string) => {
-  const lowerSearchTerm = searchTerm.toLowerCase();
-  
-  return (advocate: Advocate): boolean => {
-    return (
-      advocate.firstName.toLowerCase().includes(lowerSearchTerm) ||
-      advocate.lastName.toLowerCase().includes(lowerSearchTerm) ||
-      advocate.city.toLowerCase().includes(lowerSearchTerm) ||
-      advocate.degree.toLowerCase().includes(lowerSearchTerm) ||
-      advocate.specialties.some(specialty => specialty.toLowerCase().includes(lowerSearchTerm)) ||
-      advocate.yearsOfExperience.toString().includes(lowerSearchTerm)
-    );
-  };
-};
+import SearchComponent from "../components/SearchComponent";
+import { advocateFilter } from "../utils/filters";
 
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
@@ -100,10 +87,13 @@ export default function Home() {
     {
       key: 'specialties',
       header: 'Specialties',
+      wrapContent: true,
       render: (advocate: Advocate) => (
-        <div>
+        <div className="max-w-xs">
           {advocate.specialties.map((s, i) => (
-            <div key={i}>{s}</div>
+            <span key={i} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1 mb-1">
+              {s}
+            </span>
           ))}
         </div>
       ),
@@ -121,31 +111,25 @@ export default function Home() {
   ];
 
   return (
-    <main style={{ margin: "24px" }}>
-      <h1>Solace Advocates</h1>
-      <br />
-      <br />
+    <div className="space-y-6">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Solace Advocates</h1>
+        <p className="text-gray-600">Find and connect with healthcare advocates</p>
+      </div>
       
       {error && (
-        <div style={{ color: "red", marginBottom: "20px" }}>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
           {error}
         </div>
       )}
       
-      <div>
-        <p>Search</p>
-        <p>
-          Searching for: <span>{searchTerm}</span>
-        </p>
-        <input 
-          style={{ border: "1px solid black" }} 
-          onChange={onSearchChange}
-          value={searchTerm}
-        />
-        <button onClick={resetSearch}>Reset Search</button>
-      </div>
-      <br />
-      <br />
+      <SearchComponent
+        searchTerm={searchTerm}
+        onSearchChange={onSearchChange}
+        onReset={resetSearch}
+        placeholder="Search by name, city, degree, specialties, or experience..."
+        label="Search Advocates"
+      />
       
       <PaginationTable
         data={filteredAdvocates}
@@ -154,6 +138,6 @@ export default function Home() {
         onPageChange={handlePageChange}
         columns={advocateColumns}
       />
-    </main>
+    </div>
   );
 }

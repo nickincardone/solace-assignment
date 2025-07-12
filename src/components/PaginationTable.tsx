@@ -9,6 +9,7 @@ interface PaginationTableProps<T> {
     key: string;
     header: string;
     render: (item: T, index: number) => React.ReactNode;
+    wrapContent?: boolean;
   }>;
 }
 
@@ -28,6 +29,11 @@ export default function PaginationTable<T>({
         <button
           key={i}
           onClick={() => onPageChange(i)}
+          className={`px-3 py-2 text-sm rounded-md ${
+            i === currentPage
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+          } transition-colors`}
         >
           {i}
         </button>
@@ -37,46 +43,83 @@ export default function PaginationTable<T>({
   };
 
   return (
-    <div>
-      <table>
-        <thead>
-          <tr>
-            {columns.map((column) => (
-              <th key={column.key}>{column.header}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr key={index}>
+    <div className="space-y-4">
+      <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
               {columns.map((column) => (
-                <td key={column.key}>
-                  {column.render(item, index)}
-                </td>
+                <th 
+                  key={column.key} 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  {column.header}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {data.length === 0 ? (
+              <tr>
+                <td 
+                  colSpan={columns.length} 
+                  className="px-6 py-12 text-center text-gray-500"
+                >
+                  No advocates found
+                </td>
+              </tr>
+            ) : (
+              data.map((item, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  {columns.map((column) => (
+                    <td 
+                      key={column.key} 
+                      className={`px-6 py-4 text-sm text-gray-900 ${
+                        column.wrapContent ? '' : 'whitespace-nowrap'
+                      }`}
+                    >
+                      {column.render(item, index)}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
       
       {pagination && (
-        <div>
-          <div>
-            Showing {data.length} of {pagination.total} items
+        <div className="flex items-center justify-between bg-white px-6 py-3 border border-gray-200 rounded-lg">
+          <div className="text-sm text-gray-700">
+            Showing <span className="font-medium">{data.length}</span> of{' '}
+            <span className="font-medium">{pagination.total}</span> advocates
           </div>
-          <div>
+          
+          <div className="flex items-center space-x-2">
             <button
               onClick={() => onPageChange(currentPage - 1)}
               disabled={!pagination.hasPreviousPage}
+              className={`px-3 py-2 text-sm rounded-md ${
+                pagination.hasPreviousPage
+                  ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+              } transition-colors`}
             >
               Previous
             </button>
             
-            {renderPageNumbers()}
+            <div className="flex space-x-1">
+              {renderPageNumbers()}
+            </div>
             
             <button
               onClick={() => onPageChange(currentPage + 1)}
               disabled={!pagination.hasNextPage}
+              className={`px-3 py-2 text-sm rounded-md ${
+                pagination.hasNextPage
+                  ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+              } transition-colors`}
             >
               Next
             </button>
