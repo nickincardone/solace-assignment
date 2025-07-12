@@ -13,7 +13,7 @@ export default function Home() {
 
   const fetchAdvocates = async (page: number = 1) => {
     try {
-      const response = await fetch(`/api/advocates?limit=5&page=${page}`);
+      const response = await fetch(`/api/advocates?limit=20&page=${page}`);
       const jsonResponse: AdvocatesSuccessResponse = await response.json();
       setAdvocates(jsonResponse.data);
       setFilteredAdvocates(jsonResponse.data);
